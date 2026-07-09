@@ -20,7 +20,7 @@ To provide a fast, memory-safe, and self-hostable service implemented in Rust th
 ## Key Features
 - **Link Cleaning:** Takes a provided Bilibili URL (short or long), resolves any redirects, and sanitizes it by removing tracking parameters.
 - **RESTful API:**
-  - `GET /api/v1/clean?url={url}`: Returns a JSON response containing the cleaned URL.
+  - `GET /api/v1/clean?url={url}&format={json|text}`: Returns a JSON response (default) or plain text (`format=text`) containing the cleaned URL.
   - `GET /api/v1/redirect?url={url}`: HTTP 302 redirect directly to the cleaned URL.
   - `PUT /api/v1/settings/auto-redirect`: Updates client preference (e.g., via cookie) to toggle automatic redirection on the web UI.
 - **Dockerized:** Fully containerized for easy scaling and deployment in any environment.
