@@ -1,0 +1,11 @@
+[package]
+name = "b23_rs"
+version = "0.1.0"
+edition = "2024"
+description = "A tracing-free bilibili short URL service clone."
+authors = ["Conductor <conductor@example.com>"]
+
+[dependencies]
+axum = "0.8.9"
+tokio = { version = "1.52.3", features = ["full"] }
+tower = { version = "0.5.3", features = ["util"] }

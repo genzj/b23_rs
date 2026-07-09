@@ -11,5 +11,5 @@ Welcome to the Conductor documentation for this project. This directory contains
 
 ---
 
-- [ ] **Track: Scaffold the project (Axum, Docker, CI/CD)**
+- [x] **Track: Scaffold the project (Axum, Docker, CI/CD)**
 *Link: [./tracks/scaffold_20260708/](./tracks/scaffold_20260708/)*
