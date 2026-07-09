@@ -1,6 +1,7 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::sync::LazyLock;
 use url::Url;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -20,7 +21,17 @@ pub enum ResolverError {
     UrlParseError(#[from] url::ParseError),
 }
 
-const ALLOWED_PARAMS: &[&str] = &["p", "page", "t", "itemsid", "tab", "topic_id", "vote_id"];
+static ALLOWED_PARAMS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    let mut set = HashSet::new();
+    set.insert("p");
+    set.insert("page");
+    set.insert("t");
+    set.insert("itemsid");
+    set.insert("tab");
+    set.insert("topic_id");
+    set.insert("vote_id");
+    set
+});
 
 pub async fn resolve_and_clean(client: &Client, url: &str) -> Result<CleanResult, ResolverError> {
     let raw_url = resolve_url(client, url).await?;
