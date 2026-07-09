@@ -7,5 +7,13 @@ authors = ["Conductor <conductor@example.com>"]
 
 [dependencies]
 axum = "0.8.9"
+reqwest = { version = "0.13.4", features = ["json", "rustls"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+thiserror = "2.0.18"
 tokio = { version = "1.52.3", features = ["full"] }
 tower = { version = "0.5.3", features = ["util"] }
+url = "2.5.8"
+
+[dev-dependencies]
+http-body-util = "0.1.3"
