@@ -20,26 +20,7 @@ pub enum ResolverError {
     UrlParseError(#[from] url::ParseError),
 }
 
-const TRACKING_PARAMS: &[&str] = &[
-    "spm_id_from",
-    "vd_source",
-    "buvid",
-    "is_story_h5",
-    "mid",
-    "plat_id",
-    "share_from",
-    "share_plat",
-    "share_session_id",
-    "share_source",
-    "share_tag",
-    "timestamp",
-    "unique_k",
-    "up_id",
-    "share_medium",
-    "share_origin",
-    "from_spmid",
-    "spmid",
-];
+const ALLOWED_PARAMS: &[&str] = &["p", "page", "t", "itemsid", "tab", "topic_id", "vote_id"];
 
 pub async fn resolve_and_clean(client: &Client, url: &str) -> Result<CleanResult, ResolverError> {
     let raw_url = resolve_url(client, url).await?;
@@ -70,10 +51,11 @@ fn clean_url(url: &str) -> Result<CleanResult, ResolverError> {
     let mut kept_pairs = Vec::new();
 
     for (k, v) in parsed_url.query_pairs() {
-        if TRACKING_PARAMS.contains(&k.as_ref()) {
-            stripped_params.insert(k.into_owned(), v.into_owned());
-        } else {
+        let k_lower = k.to_lowercase();
+        if ALLOWED_PARAMS.contains(&k_lower.as_str()) {
             kept_pairs.push((k.into_owned(), v.into_owned()));
+        } else {
+            stripped_params.insert(k.into_owned(), v.into_owned());
         }
     }
 

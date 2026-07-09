@@ -18,7 +18,7 @@ To provide a fast, memory-safe, and self-hostable service implemented in Rust th
 - Developers seeking a fast, reliable, RESTful, and containerized link resolver to integrate into their own applications or bots.
 
 ## Key Features
-- **Link Cleaning:** Takes a provided Bilibili URL (short or long), resolves any redirects, and sanitizes it by removing tracking parameters.
+- **Link Cleaning:** Takes a provided Bilibili URL (short or long), resolves any redirects, and sanitizes it using an allow-list strategy, keeping only safe parameters (e.g., `p`, `page`, `t`, `itemsId`, `tab`, `topic_id`, `vote_id`).
 - **RESTful API:**
   - `GET /api/v1/clean?url={url}&format={json|text}`: Returns a JSON response (default) or plain text (`format=text`) containing the cleaned URL.
   - `GET /api/v1/redirect?url={url}`: HTTP 302 redirect directly to the cleaned URL.
