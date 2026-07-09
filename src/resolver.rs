@@ -101,20 +101,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_resolve_and_clean_b23() {
+        let mock_server = crate::test_helpers::setup_mock_server().await;
         let client = Client::new();
-        let url = "https://b23.tv/rlUSCcz";
+        let url = format!("{}/rlUSCcz", mock_server.uri());
 
-        let result = resolve_and_clean(&client, url).await.unwrap();
+        let result = resolve_and_clean(&client, &url).await.unwrap();
 
         // As per the specification acceptance criteria:
         assert_eq!(
             result.sanitized_url,
-            "https://www.bilibili.com/video/BV1BECcB3EG6?p=1"
+            format!("{}/video/BV1BECcB3EG6?p=1", mock_server.uri())
         );
         assert!(
             result
                 .raw_url
-                .starts_with("https://www.bilibili.com/video/BV1BECcB3EG6")
+                .starts_with(&format!("{}/video/BV1BECcB3EG6", mock_server.uri()))
         );
         // Make sure we stripped some params
         assert!(!result.stripped_params.is_empty());

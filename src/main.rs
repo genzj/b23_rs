@@ -11,6 +11,8 @@ use std::net::SocketAddr;
 
 mod resolver;
 
+#[cfg(test)]
+pub mod test_helpers;
 #[derive(Clone)]
 struct AppState {
     client: Client,
@@ -122,6 +124,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_clean_api_json() {
+        let mock_server = crate::test_helpers::setup_mock_server().await;
         let state = AppState {
             client: Client::new(),
         };
@@ -132,7 +135,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/api/v1/clean?url=https://b23.tv/rlUSCcz")
+                    .uri(format!("/api/v1/clean?url={}/rlUSCcz", mock_server.uri()))
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -145,12 +148,13 @@ mod tests {
 
         assert_eq!(
             json["sanitized_url"],
-            "https://www.bilibili.com/video/BV1BECcB3EG6?p=1"
+            format!("{}/video/BV1BECcB3EG6?p=1", mock_server.uri())
         );
     }
 
     #[tokio::test]
     async fn test_clean_api_text() {
+        let mock_server = crate::test_helpers::setup_mock_server().await;
         let state = AppState {
             client: Client::new(),
         };
@@ -161,7 +165,10 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/api/v1/clean?url=https://b23.tv/rlUSCcz&format=text")
+                    .uri(format!(
+                        "/api/v1/clean?url={}/rlUSCcz&format=text",
+                        mock_server.uri()
+                    ))
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -172,12 +179,13 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         assert_eq!(
             &body[..],
-            b"https://www.bilibili.com/video/BV1BECcB3EG6?p=1"
+            format!("{}/video/BV1BECcB3EG6?p=1", mock_server.uri()).as_bytes()
         );
     }
 
     #[tokio::test]
     async fn test_redirect_api() {
+        let mock_server = crate::test_helpers::setup_mock_server().await;
         let state = AppState {
             client: Client::new(),
         };
@@ -188,7 +196,10 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/api/v1/redirect?url=https://b23.tv/rlUSCcz")
+                    .uri(format!(
+                        "/api/v1/redirect?url={}/rlUSCcz",
+                        mock_server.uri()
+                    ))
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -203,7 +214,7 @@ mod tests {
                 .unwrap()
                 .to_str()
                 .unwrap(),
-            "https://www.bilibili.com/video/BV1BECcB3EG6?p=1"
+            format!("{}/video/BV1BECcB3EG6?p=1", mock_server.uri())
         );
     }
 
