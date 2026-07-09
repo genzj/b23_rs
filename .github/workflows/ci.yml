@@ -38,6 +38,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: Prod
     permissions:
       contents: read
       packages: write
@@ -57,8 +58,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           
       - name: Extract metadata
         id: meta
@@ -66,7 +67,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/b23_rs
+            ${{ secrets.DOCKER_HUB_USERNAME }}/b23_rs
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
