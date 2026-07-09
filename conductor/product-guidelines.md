@@ -11,7 +11,7 @@
 
 ## Technical Architecture & Code Quality
 - **Idiomatic Rust:** Write safe, idiomatic Rust code following standard formatting (`rustfmt`) and linting (`clippy`) guidelines.
-- **Comprehensive Testing:** Implement unit and integration tests to verify parameter stripping, edge cases, and API contract correctness.
+- **Comprehensive Testing:** Implement unit and integration tests to verify parameter stripping, edge cases, and API contract correctness. Enforce zero external network access from all unit tests using mocking (e.g., `wiremock`).
 - **Containerization First:** The application must be designed to run statelessly in Docker, configurable via environment variables.
 
 ## Deployment & CI/CD
