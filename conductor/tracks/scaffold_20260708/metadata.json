@@ -1,0 +1,8 @@
+{
+  "track_id": "scaffold_20260708",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-07-08T17:28:00Z",
+  "updated_at": "2026-07-08T17:28:00Z",
+  "description": "Scaffold the project (Axum, Docker, CI/CD)"
+}
