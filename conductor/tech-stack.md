@@ -6,6 +6,7 @@
 ## Backend Framework & Libraries
 - **Web Framework:** [Axum](https://github.com/tokio-rs/axum) - A highly ergonomic and fast web framework built on top of Tokio. Chosen for excellent routing, simple handlers, and strong ecosystem integration.
 - **HTTP Client:** [Reqwest](https://github.com/seanmonstar/reqwest) - Used to perform HTTP requests to `b23.tv` links and follow redirects to discover the actual destination URL.
+- **DNS Resolution:** [hickory-resolver](https://github.com/hickory-dns/hickory-dns) - Injected into the HTTP client to implement DNS caching and enforce connections only to certified upstream domains.
 - **Serialization:** [Serde](https://serde.rs/) & [serde_json](https://github.com/serde-rs/json) - The standard Rust framework for serializing and deserializing data structures, required for the RESTful JSON API.
 - **Error Handling:** [anyhow](https://github.com/dtolnay/anyhow) / [thiserror](https://github.com/dtolnay/thiserror) - For clean and descriptive error propagation.
 - **Testing (Mocking):** [wiremock](https://github.com/LukeMathWalker/wiremock-rs) - HTTP mocking to enforce zero external network access in unit tests.

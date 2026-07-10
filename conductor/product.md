@@ -24,4 +24,5 @@ To provide a fast, memory-safe, and self-hostable service implemented in Rust th
   - `GET /api/v1/redirect?url={url}`: HTTP 302 redirect directly to the cleaned URL.
   - `PUT /api/v1/settings/auto-redirect`: Updates client preference (e.g., via cookie) to toggle automatic redirection on the web UI.
 - **Dockerized:** Fully containerized for easy scaling and deployment in any environment.
+- **Secure by Default:** Prevents Server-Side Request Forgery (SSRF) and data leaks by forcing the internal URL resolver to only connect to an allowlist of trusted upstream domains, regardless of the user-provided URL.
 - **CI/CD Pipeline:** Automated GitHub workflow for building and publishing production-ready Docker images.
