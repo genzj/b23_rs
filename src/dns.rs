@@ -54,7 +54,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_secure_resolver_success() {
-        let resolver = SecureResolver::new(vec!["example.com".to_string()]);
+        let resolver = SecureResolver::new(vec!["localhost".to_string()]);
         let name = Name::from_str("some-random-domain.com").unwrap();
 
         let mut addrs = resolver.resolve(name).await.expect("Failed to resolve");
@@ -65,7 +65,7 @@ mod tests {
     async fn test_secure_resolver_failure() {
         let resolver =
             SecureResolver::new(vec!["invalid.domain.that.does.not.exist.test".to_string()]);
-        let name = Name::from_str("example.com").unwrap();
+        let name = Name::from_str("localhost").unwrap();
 
         let result = resolver.resolve(name).await;
         assert!(result.is_err());
