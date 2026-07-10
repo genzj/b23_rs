@@ -1,0 +1,8 @@
+{
+  "track_id": "secure_resolver_20260710",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-07-10T00:18:00Z",
+  "updated_at": "2026-07-10T00:18:00Z",
+  "description": "Improve security by forcing the URL resolver to connect only to allowed upstream domains (e.g. b23.tv), overriding user-submitted hostnames. Implement DNS caching and reuse the reqwest client."
+}
