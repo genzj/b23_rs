@@ -7,6 +7,7 @@ authors = ["Conductor <conductor@example.com>"]
 
 [dependencies]
 axum = "0.8.9"
+hickory-resolver = "0.24.0"
 reqwest = { version = "0.13.4", features = ["json", "rustls"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"

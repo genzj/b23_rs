@@ -9,6 +9,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
+mod dns;
 mod resolver;
 
 #[cfg(test)]
@@ -77,7 +78,20 @@ async fn redirect_handler(
 
 #[tokio::main]
 async fn main() {
-    let client = Client::new();
+    let domains_env =
+        std::env::var("UPSTREAM_DOMAINS").unwrap_or_else(|_| "b23.tv,d.bilibili.com".to_string());
+    let domains: Vec<String> = domains_env
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    let secure_resolver = std::sync::Arc::new(crate::dns::SecureResolver::new(domains));
+    let client = Client::builder()
+        .dns_resolver(secure_resolver)
+        .build()
+        .expect("Failed to build HTTP client");
+
     let state = AppState { client };
 
     let app = Router::new()
