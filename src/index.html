@@ -131,7 +131,7 @@
           const wasCleaned = Object.prototype.hasOwnProperty.call(stripped, name);
           addParameterCell(row, name, true);
           addParameterCell(row, value, true);
-          addParameterCell(row, wasCleaned ? 'Removed by B23 Rust' : 'Kept by B23 Rust');
+          addParameterCell(row, wasCleaned ? 'Removed' : 'Kept');
           parameterRows.append(row);
         }
       }
