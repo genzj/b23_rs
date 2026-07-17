@@ -1,0 +1,10 @@
+services:
+  b23-rs:
+    image: genzj/b23_rs:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
