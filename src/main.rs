@@ -152,6 +152,11 @@ mod tests {
             response.headers().get("content-type").unwrap(),
             "text/html; charset=utf-8"
         );
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let page = std::str::from_utf8(&body).unwrap();
+        assert!(page.contains("id=\"parameter-review\""));
+        assert!(page.contains("stripped_params"));
     }
 
     use http_body_util::BodyExt;

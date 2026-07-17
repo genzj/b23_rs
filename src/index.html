@@ -18,6 +18,9 @@
     .btn-clean:hover, .btn-clean:focus { background: #0b563f; border-color: #0b563f; color: #fff; }
     .result { border-left: 4px solid var(--forest); background: #edf7f0; padding: 1rem; }
     .result-link { overflow-wrap: anywhere; }
+    .parameter-review { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 1rem; }
+    .parameter-review summary { color: var(--forest); cursor: pointer; font-weight: 600; }
+    .parameter-review code { overflow-wrap: anywhere; white-space: normal; }
     .status-error { color: var(--coral); }
     footer { border-top: 1px solid var(--line); color: #526158; font-size: .9rem; margin-top: 3rem; padding-top: 1.25rem; }
     @media (max-width: 575px) { .site-shell { padding-top: 2rem; } .brand { font-size: 2rem; } }
@@ -47,6 +50,18 @@
         <p class="fw-semibold mb-1">Clean destination</p>
         <a id="result-link" class="result-link d-block mb-3" rel="noreferrer"></a>
         <button id="copy-button" class="btn btn-outline-secondary btn-sm" type="button">Copy link</button>
+        <details id="parameter-review" class="parameter-review d-none">
+          <summary>Parameter details</summary>
+          <p class="small text-secondary mt-2 mb-2">Parameters found in the expanded destination before B23 Rust cleaned it.</p>
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">B23 Rust action</th></tr>
+              </thead>
+              <tbody id="parameter-rows"></tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -63,6 +78,8 @@
     const result = document.querySelector('#result');
     const resultLink = document.querySelector('#result-link');
     const copyButton = document.querySelector('#copy-button');
+    const parameterReview = document.querySelector('#parameter-review');
+    const parameterRows = document.querySelector('#parameter-rows');
 
     function setStatus(message, isError = false) {
       status.textContent = message;
@@ -73,6 +90,53 @@
       result.classList.add('d-none');
       resultLink.removeAttribute('href');
       resultLink.textContent = '';
+      parameterReview.classList.add('d-none');
+      parameterReview.open = false;
+      parameterRows.replaceChildren();
+    }
+
+    function addParameterCell(row, text, asCode = false) {
+      const cell = document.createElement('td');
+      const content = asCode ? document.createElement('code') : document.createElement('span');
+      content.textContent = text;
+      cell.append(content);
+      row.append(cell);
+    }
+
+    function showParameterReview(payload) {
+      parameterRows.replaceChildren();
+      let parameters = [];
+
+      try {
+        parameters = Array.from(new URL(payload.raw_url).searchParams.entries());
+      } catch (_) {
+        return;
+      }
+
+      if (parameters.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 3;
+        cell.className = 'text-secondary';
+        cell.textContent = 'No parameters were found in the expanded destination.';
+        row.append(cell);
+        parameterRows.append(row);
+      } else {
+        const stripped = payload.stripped_params && typeof payload.stripped_params === 'object'
+          ? payload.stripped_params
+          : {};
+
+        for (const [name, value] of parameters) {
+          const row = document.createElement('tr');
+          const wasCleaned = Object.prototype.hasOwnProperty.call(stripped, name);
+          addParameterCell(row, name, true);
+          addParameterCell(row, value, true);
+          addParameterCell(row, wasCleaned ? 'Removed by B23 Rust' : 'Kept by B23 Rust');
+          parameterRows.append(row);
+        }
+      }
+
+      parameterReview.classList.remove('d-none');
     }
 
     form.addEventListener('submit', async (event) => {
@@ -103,6 +167,7 @@
 
         resultLink.href = payload.sanitized_url;
         resultLink.textContent = payload.sanitized_url;
+        showParameterReview(payload);
         result.classList.remove('d-none');
         setStatus('Link cleaned.');
       } catch (error) {
