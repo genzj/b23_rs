@@ -2,7 +2,7 @@ use axum::{
     Router,
     extract::{Query, State},
     http::StatusCode,
-    response::{IntoResponse, Json, Redirect, Response},
+    response::{Html, IntoResponse, Json, Redirect, Response},
     routing::get,
 };
 use reqwest::Client;
@@ -37,6 +37,10 @@ enum Format {
 #[derive(Serialize)]
 struct ErrorResponse {
     error: String,
+}
+
+async fn index_handler() -> Html<&'static str> {
+    Html(include_str!("index.html"))
 }
 
 // Handler for /api/v1/clean
@@ -95,6 +99,7 @@ async fn main() {
     let state = AppState { client };
 
     let app = Router::new()
+        .route("/", get(index_handler))
         .route("/api/health", get(|| async { "OK" }))
         .route("/api/v1/clean", get(clean_handler))
         .route("/api/v1/redirect", get(redirect_handler))
@@ -131,6 +136,22 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_root_page_returns_embedded_html() {
+        let app = Router::new().route("/", get(index_handler));
+
+        let response = app
+            .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers().get("content-type").unwrap(),
+            "text/html; charset=utf-8"
+        );
     }
 
     use http_body_util::BodyExt;
