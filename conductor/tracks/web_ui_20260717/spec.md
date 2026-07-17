@@ -10,8 +10,9 @@ Add a lightweight, embedded web interface that explains B23 Rust's privacy-prese
 2. Present the service purpose, privacy benefit, and attribution to the original `b23.wtf` project with a link.
 3. Provide a labeled URL input and submit action that calls `GET /api/v1/clean` with the user-provided URL.
 4. Show the cleaned destination URL after a successful request, with a direct link and a copy action.
-5. Present clear validation, loading, and API error states without navigating away from the page.
-6. Preserve the existing API routes and their JSON/text response behavior.
+5. Show a collapsed parameter review beneath the cleaned destination, listing each parameter and value from the expanded pre-cleaning URL and whether B23 Rust retained or removed it.
+6. Present clear validation, loading, and API error states without navigating away from the page.
+7. Preserve the existing API routes and their JSON/text response behavior.
 
 ## Non-Functional Requirements
 
@@ -26,8 +27,9 @@ Add a lightweight, embedded web interface that explains B23 Rust's privacy-prese
 2. Submitting a URL sends an encoded request to `/api/v1/clean` and displays the API's `sanitized_url` response as a clickable destination.
 3. Empty input, failed requests, and malformed API responses show understandable inline error feedback without an unhandled browser exception.
 4. The result can be copied through the browser Clipboard API, with feedback when copying succeeds or is unavailable.
-5. The existing API endpoint tests remain passing, and a test verifies the root route returns the embedded HTML with `text/html` content type.
-6. `cargo fmt --check`, `cargo clippy -- -D warnings`, and `cargo test` pass.
+5. The parameter review is folded initially and identifies every parameter from `raw_url` with its value and an authoritative kept/removed action derived from `stripped_params`.
+6. The existing API endpoint tests remain passing, and a test verifies the root route returns the embedded HTML with `text/html` content type.
+7. `cargo fmt --check`, `cargo clippy -- -D warnings`, and `cargo test` pass.
 
 ## Out of Scope
 
