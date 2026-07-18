@@ -143,7 +143,14 @@
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const value = urlInput.value.trim();
+      let value = urlInput.value.trim();
+
+      const urlMatch = value.match(/https?:\/\/[^\s]+/);
+      if (urlMatch) {
+        value = urlMatch[0];
+        urlInput.value = value;
+      }
+
       clearResult();
 
       if (!value) {
