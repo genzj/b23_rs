@@ -50,6 +50,7 @@
         <p class="fw-semibold mb-1">Clean destination</p>
         <a id="result-link" class="result-link d-block mb-3" rel="noreferrer"></a>
         <button id="copy-button" class="btn btn-outline-secondary btn-sm" type="button">Copy link</button>
+        <button id="share-button" class="btn btn-outline-secondary btn-sm d-none" type="button">Share link</button>
         <details id="parameter-review" class="parameter-review d-none">
           <summary>Parameter details</summary>
           <p class="small text-secondary mt-2 mb-2">Parameters found in the expanded destination before B23 Rust cleaned it.</p>
@@ -78,6 +79,7 @@
     const result = document.querySelector('#result');
     const resultLink = document.querySelector('#result-link');
     const copyButton = document.querySelector('#copy-button');
+    const shareButton = document.querySelector('#share-button');
     const parameterReview = document.querySelector('#parameter-review');
     const parameterRows = document.querySelector('#parameter-rows');
 
@@ -168,6 +170,13 @@
         resultLink.href = payload.sanitized_url;
         resultLink.textContent = payload.sanitized_url;
         showParameterReview(payload);
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ url: payload.sanitized_url })) {
+          shareButton.classList.remove('d-none');
+        } else {
+          shareButton.classList.add('d-none');
+        }
+
         result.classList.remove('d-none');
         setStatus('Link cleaned.');
       } catch (error) {
@@ -188,6 +197,17 @@
         setStatus('Clean link copied.');
       } catch (_) {
         setStatus('The clean link could not be copied.', true);
+      }
+    });
+
+    shareButton.addEventListener('click', async () => {
+      const value = resultLink.href;
+      try {
+        await navigator.share({ url: value });
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setStatus('The clean link could not be shared.', true);
+        }
       }
     });
   </script>
