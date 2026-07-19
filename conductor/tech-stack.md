@@ -15,6 +15,7 @@
 - **Architecture:** Single HTML file (`index.html`).
 - **Styling:** Simple, CDN-based CSS framework (e.g., Bootstrap 5 or Tailwind CSS via CDN) to ensure rapid development without requiring a complex frontend build process (Node.js/npm).
 - **JavaScript:** Vanilla JS to handle API requests and DOM updates, keeping the frontend extremely lightweight.
+- **Internationalization:** Translation dictionaries (JSON) are embedded into the Rust binary at compile time and dynamically injected into the frontend HTML based on user preference or browser headers.
 - **Code Quality:** [Biome](https://biomejs.dev/) - A fast, Rust-based linter and formatter used to maintain code quality for HTML and JS without requiring Node.js dependencies.
 - **Integration:** The `index.html` file is embedded directly into the Rust backend binary at compile time (e.g., using Rust's `include_str!` macro). This generates a single self-contained executable for incredibly simple deployment.
 
