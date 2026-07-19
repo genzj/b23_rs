@@ -1,7 +1,7 @@
 use axum::{
     Router,
     extract::{Query, State},
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::{Html, IntoResponse, Json, Redirect, Response},
     routing::get,
 };
@@ -39,8 +39,45 @@ struct ErrorResponse {
     error: String,
 }
 
-async fn index_handler() -> Html<&'static str> {
-    Html(include_str!("index.html"))
+const EN_JSON: &str = include_str!("locales/en.json");
+const ZH_CN_JSON: &str = include_str!("locales/zh-cn.json");
+
+async fn index_handler(headers: HeaderMap) -> Html<String> {
+    let mut lang = "en";
+
+    let cookie_str = headers
+        .get(axum::http::header::COOKIE)
+        .and_then(|c| c.to_str().ok())
+        .unwrap_or("");
+
+    if cookie_str.contains("lang=zh-cn") {
+        lang = "zh-cn";
+    } else if cookie_str.contains("lang=en") {
+        lang = "en";
+    } else {
+        let accept_lang = headers
+            .get(axum::http::header::ACCEPT_LANGUAGE)
+            .and_then(|c| c.to_str().ok())
+            .unwrap_or("")
+            .to_lowercase();
+
+        if accept_lang.contains("zh-cn") || accept_lang.starts_with("zh") {
+            lang = "zh-cn";
+        }
+    }
+
+    let i18n_json = match lang {
+        "zh-cn" => ZH_CN_JSON,
+        _ => EN_JSON,
+    };
+
+    let html = include_str!("index.html");
+    let injected = format!(
+        "<script>window.i18n = {}; window.currentLang = '{}';</script>\n</head>",
+        i18n_json, lang
+    );
+
+    Html(html.replace("</head>", &injected))
 }
 
 // Handler for /api/v1/clean

@@ -28,16 +28,22 @@
 </head>
 <body>
   <main class="site-shell">
-    <header class="masthead">
-      <p class="text-uppercase small fw-semibold text-success mb-2">Privacy-preserving Bilibili links</p>
-      <h1 class="brand">B23 Rust</h1>
-      <p class="lead mb-0">Expand a Bilibili link, remove tracking parameters, and share the destination without the extra baggage.</p>
+    <header class="masthead position-relative">
+      <div class="position-absolute top-0 end-0 mt-2">
+        <select id="lang-switcher" class="form-select form-select-sm" style="width: auto;" aria-label="Language Switcher">
+          <option value="en">🇺🇸 EN</option>
+          <option value="zh-cn">🇨🇳 中文</option>
+        </select>
+      </div>
+      <p id="subtitle" class="text-uppercase small fw-semibold text-success mb-2">Privacy-preserving Bilibili links</p>
+      <h1 id="brand" class="brand">B23 Rust</h1>
+      <p id="lead" class="lead mb-0">Expand a Bilibili link, remove tracking parameters, and share the destination without the extra baggage.</p>
     </header>
 
     <section class="tool" aria-labelledby="clean-heading">
       <h2 id="clean-heading" class="h4 mb-3">Clean a link</h2>
       <form id="clean-form" novalidate>
-        <label class="form-label fw-semibold" for="url">Bilibili URL</label>
+        <label id="url-label" class="form-label fw-semibold" for="url">Bilibili URL</label>
         <div class="input-group">
           <input id="url" class="form-control" type="url" inputmode="url" autocomplete="url" placeholder="https://b23.tv/..." aria-describedby="url-help status" required>
           <button id="paste-button" class="btn btn-outline-secondary d-none" type="button">Paste</button>
@@ -48,17 +54,17 @@
 
       <p id="status" class="mt-3 mb-0" role="status" aria-live="polite"></p>
       <div id="result" class="result mt-3 d-none" aria-live="polite">
-        <p class="fw-semibold mb-1">Clean destination</p>
+        <p id="clean-destination" class="fw-semibold mb-1">Clean destination</p>
         <a id="result-link" class="result-link d-block mb-3" rel="noreferrer"></a>
         <button id="copy-button" class="btn btn-outline-secondary btn-sm" type="button">Copy link</button>
         <button id="share-button" class="btn btn-outline-secondary btn-sm d-none" type="button">Share link</button>
         <details id="parameter-review" class="parameter-review d-none">
-          <summary>Parameter details</summary>
-          <p class="small text-secondary mt-2 mb-2">Parameters found in the expanded destination before B23 Rust cleaned it.</p>
+          <summary id="param-details-summary">Parameter details</summary>
+          <p id="param-details-desc" class="small text-secondary mt-2 mb-2">Parameters found in the expanded destination before B23 Rust cleaned it.</p>
           <div class="table-responsive">
             <table class="table table-sm mb-0">
               <thead>
-                <tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">B23 Rust action</th></tr>
+                <tr><th id="th-parameter" scope="col">Parameter</th><th id="th-value" scope="col">Value</th><th id="th-action" scope="col">B23 Rust action</th></tr>
               </thead>
               <tbody id="parameter-rows"></tbody>
             </table>
@@ -67,12 +73,50 @@
       </div>
     </section>
 
-    <footer>
+    <footer id="footer-text">
       Inspired by <a href="https://github.com/nicholascw/b23.wtf">b23.wtf</a>. B23 Rust resolves links through its server-side allowlist and retains only supported destination parameters.
     </footer>
   </main>
 
   <script>
+    
+    // i18n injection and switcher
+    if (window.i18n) {
+      document.title = window.i18n.page_title || document.title;
+      const i18nKeys = {
+        'subtitle': 'subtitle', 'brand': 'brand', 'lead': 'lead', 'clean-heading': 'clean_heading',
+        'url-label': 'url_label', 'paste-button': 'btn_paste', 'submit-button': 'btn_clean',
+        'url-help': 'url_help', 'clean-destination': 'clean_destination', 'copy-button': 'btn_copy',
+        'share-button': 'btn_share', 'param-details-summary': 'param_details_summary',
+        'param-details-desc': 'param_details_desc', 'th-parameter': 'th_parameter',
+        'th-value': 'th_value', 'th-action': 'th_action', 'footer-text': 'footer_text'
+      };
+      for (const Object_entry of Object.entries(i18nKeys)) {
+        const [id, key] = Object_entry;
+        const el = document.getElementById(id);
+        if (el && window.i18n[key]) {
+          if (id === 'footer-text') el.innerHTML = window.i18n[key];
+          else el.textContent = window.i18n[key];
+        }
+      }
+      const urlInputEl = document.getElementById('url');
+      if (urlInputEl && window.i18n.url_placeholder) urlInputEl.placeholder = window.i18n.url_placeholder;
+    }
+
+    const langSwitcher = document.getElementById('lang-switcher');
+    if (langSwitcher && window.currentLang) {
+      langSwitcher.value = window.currentLang;
+      langSwitcher.addEventListener('change', (e) => {
+        const newLang = e.target.value;
+        document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
+        window.location.reload();
+      });
+    }
+
+    function getI18nStr(key, defaultStr) {
+      return (window.i18n && window.i18n[key]) ? window.i18n[key] : defaultStr;
+    }
+
     const form = document.querySelector('#clean-form');
     const urlInput = document.querySelector('#url');
     const pasteButton = document.querySelector('#paste-button');
@@ -122,7 +166,7 @@
         const cell = document.createElement('td');
         cell.colSpan = 3;
         cell.className = 'text-secondary';
-        cell.textContent = 'No parameters were found in the expanded destination.';
+        cell.textContent = getI18nStr('param_no_params', 'No parameters were found in the expanded destination.');
         row.append(cell);
         parameterRows.append(row);
       } else {
@@ -135,7 +179,7 @@
           const wasCleaned = Object.hasOwn(stripped, name);
           addParameterCell(row, name, true);
           addParameterCell(row, value, true);
-          addParameterCell(row, wasCleaned ? 'Removed' : 'Kept');
+          addParameterCell(row, wasCleaned ? getI18nStr('param_action_removed', 'Removed') : getI18nStr('param_action_kept', 'Kept'));
           parameterRows.append(row);
         }
       }
@@ -150,7 +194,7 @@
           const text = await navigator.clipboard.readText();
           urlInput.value = text;
         } catch (_) {
-          setStatus('The clipboard could not be read.', true);
+          setStatus(getI18nStr('status_clipboard_error', 'The clipboard could not be read.'), true);
         }
       });
     }
@@ -168,13 +212,13 @@
       clearResult();
 
       if (!value) {
-        setStatus('Enter a Bilibili URL to clean it.', true);
+        setStatus(getI18nStr('status_empty_url', 'Enter a Bilibili URL to clean it.'), true);
         urlInput.focus();
         return;
       }
 
       submitButton.disabled = true;
-      setStatus('Resolving and cleaning your link...');
+      setStatus(getI18nStr('status_resolving', 'Resolving and cleaning your link...'));
 
       try {
         const params = new URLSearchParams({ url: value });
@@ -182,10 +226,10 @@
         const payload = await response.json().catch(() => null);
 
         if (!response.ok) {
-          throw new Error(payload && typeof payload.error === 'string' ? payload.error : 'The link could not be cleaned.');
+          throw new Error(payload && typeof payload.error === 'string' ? payload.error : getI18nStr('status_clean_error', 'The link could not be cleaned.'));
         }
         if (!payload || typeof payload.sanitized_url !== 'string' || !payload.sanitized_url) {
-          throw new Error('The service returned an invalid cleaned URL.');
+          throw new Error(getI18nStr('status_invalid_url_error', 'The service returned an invalid cleaned URL.'));
         }
 
         resultLink.href = payload.sanitized_url;
@@ -199,9 +243,9 @@
         }
 
         result.classList.remove('d-none');
-        setStatus('Link cleaned.');
+        setStatus(getI18nStr('status_cleaned', 'Link cleaned.'));
       } catch (error) {
-        setStatus(error instanceof Error ? error.message : 'The link could not be cleaned.', true);
+        setStatus(error instanceof Error ? error.message : getI18nStr('status_clean_error', 'The link could not be cleaned.'), true);
       } finally {
         submitButton.disabled = false;
       }
@@ -210,14 +254,14 @@
     copyButton.addEventListener('click', async () => {
       const value = resultLink.href;
       if (!value || !navigator.clipboard) {
-        setStatus('Copying is unavailable in this browser.', true);
+        setStatus(getI18nStr('status_copy_unavailable', 'Copying is unavailable in this browser.'), true);
         return;
       }
       try {
         await navigator.clipboard.writeText(value);
-        setStatus('Clean link copied.');
+        setStatus(getI18nStr('status_copied', 'Clean link copied.'));
       } catch (_) {
-        setStatus('The clean link could not be copied.', true);
+        setStatus(getI18nStr('status_copy_error', 'The clean link could not be copied.'), true);
       }
     });
 
@@ -227,7 +271,7 @@
         await navigator.share({ url: value });
       } catch (error) {
         if (error.name !== 'AbortError') {
-          setStatus('The clean link could not be shared.', true);
+          setStatus(getI18nStr('status_share_error', 'The clean link could not be shared.'), true);
         }
       }
     });
