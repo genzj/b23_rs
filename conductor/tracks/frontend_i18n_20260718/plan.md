@@ -21,3 +21,6 @@
 - [ ] Task: Verify language fallback and cookie logic in the browser.
 - [ ] Task: Ensure the UI correctly updates without affecting brand names.
 - [ ] Task: Run `cargo fmt`, `cargo clippy`, and `cargo test` to ensure code quality and prevent CI failures.
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 45c835a
