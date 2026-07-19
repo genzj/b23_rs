@@ -108,7 +108,11 @@
       langSwitcher.value = window.currentLang;
       langSwitcher.addEventListener('change', (e) => {
         const newLang = e.target.value;
-        document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
+        if (window.cookieStore) {
+          cookieStore.set({ name: 'lang', value: newLang, path: '/', expires: Date.now() + 31536000000 });
+        } else {
+          document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
+        }
         window.location.reload();
       });
     }
