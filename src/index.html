@@ -40,6 +40,7 @@
         <label class="form-label fw-semibold" for="url">Bilibili URL</label>
         <div class="input-group">
           <input id="url" class="form-control" type="url" inputmode="url" autocomplete="url" placeholder="https://b23.tv/..." aria-describedby="url-help status" required>
+          <button id="paste-button" class="btn btn-outline-secondary d-none" type="button">Paste</button>
           <button id="submit-button" class="btn btn-clean" type="submit">Clean</button>
         </div>
         <p id="url-help" class="form-text mb-0">Short and full Bilibili URLs are supported.</p>
@@ -74,6 +75,7 @@
   <script>
     const form = document.querySelector('#clean-form');
     const urlInput = document.querySelector('#url');
+    const pasteButton = document.querySelector('#paste-button');
     const submitButton = document.querySelector('#submit-button');
     const status = document.querySelector('#status');
     const result = document.querySelector('#result');
@@ -139,6 +141,18 @@
       }
 
       parameterReview.classList.remove('d-none');
+    }
+
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      pasteButton.classList.remove('d-none');
+      pasteButton.addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          urlInput.value = text;
+        } catch (_) {
+          setStatus('The clipboard could not be read.', true);
+        }
+      });
     }
 
     form.addEventListener('submit', async (event) => {
