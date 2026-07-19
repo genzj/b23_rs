@@ -132,7 +132,7 @@
 
         for (const [name, value] of parameters) {
           const row = document.createElement('tr');
-          const wasCleaned = Object.prototype.hasOwnProperty.call(stripped, name);
+          const wasCleaned = Object.hasOwn(stripped, name);
           addParameterCell(row, name, true);
           addParameterCell(row, value, true);
           addParameterCell(row, wasCleaned ? 'Removed' : 'Kept');
