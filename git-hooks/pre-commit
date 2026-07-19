@@ -5,9 +5,9 @@ echo "Running pre-commit checks..."
 
 echo "Checking and formatting HTML (Biome)..."
 if [ -f "./biome" ]; then
-  ./biome check --write src/index.html
+  ./biome check src/index.html
 elif command -v biome &> /dev/null; then
-  biome check --write src/index.html
+  biome check src/index.html
 else
   echo "Biome not found. Please run ./setup-hooks.sh to install it."
   exit 1
